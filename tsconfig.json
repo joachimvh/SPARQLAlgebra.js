@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "newLine": "lf",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "declaration": true,
+    "allowJs": true
+  },
+  "include": [
+    "index.ts",
+    "lib/algebra.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
