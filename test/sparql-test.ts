@@ -30,9 +30,17 @@ function testPath(fileName: string, testName: string): void
         let name = testName.replace(/\.json$/, '');
         it (name, () =>
         {
+            let sparqlName = path.join('test/sparql', name + '.sparql');
+            let sparql = fs.readFileSync(sparqlName, 'utf8');
+            console.log(sparql);
             let expected = JSON.parse(fs.readFileSync(jsonName, 'utf8'));
+            console.log(require('util').inspect((expected), { depth: null, breakLength: 120 }));
+            console.log(require('util').inspect(toSparqlJs(expected), { depth: null, breakLength: 120 }));
             let query = toSparql(expected);
+            console.log(query);
             let algebra = Util.objectify(translate(query, { quads: name.endsWith('(quads)') }));
+            console.log(require('util').inspect((algebra), { depth: null, breakLength: 120 }));
+            console.log(require('util').inspect(toSparqlJs(expected), { depth: null, breakLength: 120 }));
             expect(algebra).to.deep.equal(expected);
         });
     }
