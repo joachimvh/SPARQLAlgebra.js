@@ -4,7 +4,6 @@ import Factory from './factory';
 import Util from './util';
 import * as RDF from 'rdf-js'
 import {termToString} from "rdf-string";
-import {NamedNode} from "rdf-js";
 
 const Parser = require('sparqljs').Parser;
 const isEqual = require('lodash.isequal');
@@ -245,7 +244,7 @@ function translatePath(triple: any) : Algebra.Operation[]
 
 function translatePathPredicate(predicate: any) : Algebra.Operation
 {
-    if (Util.isTerm(predicate) && predicate.termType === "NamedNode")
+    if (Util.isTerm(predicate))  // NamedNode
         return factory.createLink(predicate);
 
     if (predicate.pathType === '^')
