@@ -3,6 +3,8 @@ import * as Algebra from './algebra';
 import * as RDF from 'rdf-js'
 import Factory from "./factory";
 import Util from "./util";
+import { termToString } from "rdf-string";
+
 const SparqlGenerator = require('sparqljs').Generator;
 const Wildcard = require('sparqljs').Wildcard;
 const types = Algebra.types;
@@ -103,29 +105,6 @@ function translatePathComponent(path: Algebra.Operation): any
     }
 
     throw new Error('Unknown Path type ' + path.type);
-}
-
-function translateTerm(term: RDF.Term): string
-{
-    if (term.termType === 'BlankNode')
-        return '_:' + term.value;
-    if (term.termType === 'Literal')
-    {
-        // TODO: should check which safety checks are required
-        let lit = <RDF.Literal>term;
-        let result = `"${term.value}"`;
-        if (lit.language)
-            result += '@' + lit.language;
-        else if (lit.datatype && lit.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string')
-            result += '^^' + lit.datatype.value;
-        return result;
-    }
-    if (term.termType === 'NamedNode')
-        return term.value;
-    if (term.termType === 'Variable')
-        return '?' + term.value;
-
-    throw new Error('Unknown Term type ' + term.termType);
 }
 
 // ------------------------- EXPRESSIONS -------------------------
@@ -370,7 +349,7 @@ function translatePattern(op: Algebra.Pattern): any
 
 function replaceAggregatorVariables(s: any, map: any)
 {
-    let st = Util.isTerm(s) ? translateTerm(s) : s;
+    let st = Util.isTerm(s) ? termToString(s) : s;
 
     if (typeof st === 'string')
     {
@@ -424,19 +403,19 @@ function translateProject(op: Algebra.Project | Algebra.Ask | Algebra.Describe, 
     let aggregators: any = {};
     // these can not reference each other
     for (let agg of context.aggregates)
-        aggregators[translateTerm(agg.variable)] = translateExpression(agg);
+        aggregators[termToString(agg.variable)] = translateExpression(agg);
 
     // do these in reverse order since variables in one extend might apply to an expression in an other extend
     let extensions: any = {};
     for (let i = context.extend.length-1; i >= 0; --i)
     {
         let e = context.extend[i];
-        extensions[translateTerm(e.variable)] = replaceAggregatorVariables(translateExpression(e.expression), aggregators);
+        extensions[termToString(e.variable)] = replaceAggregatorVariables(translateExpression(e.expression), aggregators);
     }
     if (context.group.length > 0)
         result.group = context.group.map(variable =>
         {
-            let v = translateTerm(variable);
+            let v = termToString(variable);
             if (extensions[v])
             {
                 let result = extensions[v];
@@ -457,7 +436,7 @@ function translateProject(op: Algebra.Project | Algebra.Ask | Algebra.Describe, 
     if (result.variables)
     {
         result.variables = result.variables.map((term: RDF.Term) => {
-            let v = translateTerm(term);
+            let v = termToString(term);
             if (extensions[v])
                 return {
                     variable  : term,
@@ -497,7 +476,7 @@ function translateProject(op: Algebra.Project | Algebra.Ask | Algebra.Describe, 
 function objectContainsValues(o: any, vals: string[]): boolean
 {
     if (Util.isTerm(o))
-        return vals.indexOf(translateTerm(o)) >= 0;
+        return vals.indexOf(termToString(o)) >= 0;
     if (Array.isArray(o))
         return o.some(e => objectContainsValues(e, vals));
     if (o === Object(o))
