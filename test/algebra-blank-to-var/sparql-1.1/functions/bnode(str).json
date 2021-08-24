@@ -10,6 +10,9 @@
           "type": "bgp",
           "patterns": [
             {
+              "type": "pattern",
+              "termType": "Quad",
+              "value": "",
               "subject": {
                 "termType": "Variable",
                 "value": "a"
@@ -25,10 +28,12 @@
               "graph": {
                 "termType": "DefaultGraph",
                 "value": ""
-              },
-              "type": "pattern"
+              }
             },
             {
+              "type": "pattern",
+              "termType": "Quad",
+              "value": "",
               "subject": {
                 "termType": "Variable",
                 "value": "b"
@@ -44,8 +49,7 @@
               "graph": {
                 "termType": "DefaultGraph",
                 "value": ""
-              },
-              "type": "pattern"
+              }
             }
           ]
         },

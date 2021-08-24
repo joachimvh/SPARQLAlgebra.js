@@ -6,6 +6,9 @@
       "type": "bgp",
       "patterns": [
         {
+          "type": "pattern",
+          "termType": "Quad",
+          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "exam"
@@ -21,10 +24,12 @@
           "graph": {
             "termType": "DefaultGraph",
             "value": ""
-          },
-          "type": "pattern","termType": "Quad","value": ""
+          }
         },
         {
+          "type": "pattern",
+          "termType": "Quad",
+          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "exam"
@@ -40,10 +45,12 @@
           "graph": {
             "termType": "DefaultGraph",
             "value": ""
-          },
-          "type": "pattern","termType": "Quad","value": ""
+          }
         },
         {
+          "type": "pattern",
+          "termType": "Quad",
+          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "exam"
@@ -59,10 +66,12 @@
           "graph": {
             "termType": "DefaultGraph",
             "value": ""
-          },
-          "type": "pattern","termType": "Quad","value": ""
+          }
         },
         {
+          "type": "pattern",
+          "termType": "Quad",
+          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "op"
@@ -78,10 +87,12 @@
           "graph": {
             "termType": "DefaultGraph",
             "value": ""
-          },
-          "type": "pattern","termType": "Quad","value": ""
+          }
         },
         {
+          "type": "pattern",
+          "termType": "Quad",
+          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "op"
@@ -97,8 +108,7 @@
           "graph": {
             "termType": "DefaultGraph",
             "value": ""
-          },
-          "type": "pattern","termType": "Quad","value": ""
+          }
         }
       ]
     },
@@ -110,6 +120,9 @@
         "type": "bgp",
         "patterns": [
           {
+            "type": "pattern",
+            "termType": "Quad",
+            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "otherExam"
@@ -125,10 +138,12 @@
             "graph": {
               "termType": "DefaultGraph",
               "value": ""
-            },
-            "type": "pattern","termType": "Quad","value": ""
+            }
           },
           {
+            "type": "pattern",
+            "termType": "Quad",
+            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "otherExam"
@@ -144,10 +159,12 @@
             "graph": {
               "termType": "DefaultGraph",
               "value": ""
-            },
-            "type": "pattern","termType": "Quad","value": ""
+            }
           },
           {
+            "type": "pattern",
+            "termType": "Quad",
+            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "otherExam"
@@ -163,8 +180,7 @@
             "graph": {
               "termType": "DefaultGraph",
               "value": ""
-            },
-            "type": "pattern","termType": "Quad","value": ""
+            }
           }
         ]
       }
