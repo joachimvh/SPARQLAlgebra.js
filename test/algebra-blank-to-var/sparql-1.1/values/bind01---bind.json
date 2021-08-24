@@ -25,7 +25,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "book"
@@ -46,7 +45,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "book"

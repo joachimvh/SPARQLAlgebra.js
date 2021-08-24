@@ -10,7 +10,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "NamedNode",
               "value": "http://example/a"
@@ -72,7 +71,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "x"

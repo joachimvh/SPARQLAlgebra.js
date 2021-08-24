@@ -8,7 +8,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://www.example.org/instance#a"
@@ -29,7 +28,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "var0"

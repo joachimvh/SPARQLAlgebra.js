@@ -10,7 +10,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "O"
@@ -31,7 +30,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "BlankNode",
               "value": "g_0"
@@ -65,7 +63,6 @@
                   {
                     "type": "pattern",
                     "termType": "Quad",
-                    "value": "",
                     "subject": {
                       "termType": "Variable",
                       "value": "O"

@@ -10,7 +10,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "NamedNode",
               "value": "http://www.example.orgs"
@@ -68,7 +67,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://www.example.orgs"

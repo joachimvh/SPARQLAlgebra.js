@@ -10,7 +10,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "a"
@@ -31,7 +30,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "Variable",
               "value": "a"
@@ -61,7 +59,6 @@
               {
                 "type": "pattern",
                 "termType": "Quad",
-                "value": "",
                 "subject": {
                   "termType": "Variable",
                   "value": "d"
@@ -87,7 +84,6 @@
               {
                 "type": "pattern",
                 "termType": "Quad",
-                "value": "",
                 "subject": {
                   "termType": "Variable",
                   "value": "d"
@@ -114,7 +110,6 @@
             {
               "type": "pattern",
               "termType": "Quad",
-              "value": "",
               "subject": {
                 "termType": "Variable",
                 "value": "d"

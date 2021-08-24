@@ -6,11 +6,9 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "s"
@@ -44,11 +42,9 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.com/Moscow"
@@ -82,11 +78,9 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "BlankNode",
             "value": "e_b"

@@ -8,7 +8,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.com/a"
@@ -38,7 +37,6 @@
       "term": {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "NamedNode",
           "value": "http://example.com/a"
@@ -50,7 +48,6 @@
         "object": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.com/a"

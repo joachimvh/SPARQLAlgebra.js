@@ -6,7 +6,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "Variable",
           "value": "g_0"

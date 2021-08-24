@@ -6,7 +6,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "NamedNode",
           "value": "http://example.org/#x"

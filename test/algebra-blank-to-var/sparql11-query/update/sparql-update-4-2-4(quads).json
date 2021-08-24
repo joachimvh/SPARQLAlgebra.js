@@ -4,7 +4,6 @@
     {
       "type": "pattern",
       "termType": "Quad",
-      "value": "",
       "subject": {
         "termType": "Variable",
         "value": "S"
@@ -31,7 +30,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "Variable",
             "value": "S"

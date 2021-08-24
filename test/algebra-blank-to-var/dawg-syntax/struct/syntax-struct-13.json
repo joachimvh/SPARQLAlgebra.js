@@ -12,7 +12,6 @@
             {
               "type": "pattern",
               "termType": "Quad",
-              "value": "",
               "subject": {
                 "termType": "NamedNode",
                 "value": "http://example.org/ns#p"
@@ -38,7 +37,6 @@
             {
               "type": "pattern",
               "termType": "Quad",
-              "value": "",
               "subject": {
                 "termType": "NamedNode",
                 "value": "http://example.org/ns#a"
@@ -65,7 +63,6 @@
           {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "NamedNode",
               "value": "http://example.org/ns#p"
@@ -92,7 +89,6 @@
         {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.org/ns#a"

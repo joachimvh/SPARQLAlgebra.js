@@ -13,7 +13,6 @@
         "?x": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.com/SaintPetersburg"
@@ -36,7 +35,6 @@
         "?x": {
           "type": "pattern",
           "termType": "Quad",
-          "value": "",
           "subject": {
             "termType": "NamedNode",
             "value": "http://example.com/a"
@@ -48,7 +46,6 @@
           "object": {
             "type": "pattern",
             "termType": "Quad",
-            "value": "",
             "subject": {
               "termType": "NamedNode",
               "value": "http://example.com/Moscow"

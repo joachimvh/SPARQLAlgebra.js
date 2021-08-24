@@ -6,7 +6,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "e_a"
@@ -27,7 +26,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "e_a"

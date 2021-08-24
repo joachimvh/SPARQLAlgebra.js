@@ -6,7 +6,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_1"
@@ -27,7 +26,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_3"
@@ -48,7 +46,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_3"
@@ -69,7 +66,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_4"
@@ -94,7 +90,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_4"
@@ -115,7 +110,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_2"
@@ -136,7 +130,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_1"
@@ -157,7 +150,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_1"
@@ -178,7 +170,6 @@
       {
         "type": "pattern",
         "termType": "Quad",
-        "value": "",
         "subject": {
           "termType": "BlankNode",
           "value": "g_0"

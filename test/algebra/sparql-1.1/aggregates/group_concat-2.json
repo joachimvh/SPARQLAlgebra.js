@@ -18,7 +18,6 @@
                   {
                     "type": "pattern",
                     "termType": "Quad",
-                    "value": "",
                     "subject": {
                       "termType": "BlankNode",
                       "value": "g_0"
