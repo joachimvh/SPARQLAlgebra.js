@@ -83,7 +83,7 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
     // this set is filled in during the inScopeVariables call
     variables = new Set();
     varCount = 0;
-    useQuads = quads;
+    useQuads = Boolean(quads);
 
     // Assume this is an empty query
     if (!sparql.type)
@@ -92,7 +92,7 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
     if (sparql.type !== 'query' && sparql.type !== 'update')
         throw new Error('Translate only works on complete query or update objects.');
 
-    const vars: Set<RDF.Variable> = new Set(Object.keys(inScopeVariables(sparql)).map(factory.createTerm.bind(factory)));
+    const vars: Set<RDF.Variable> = <Set<RDF.Variable>> new Set(Object.keys(inScopeVariables(sparql)).map(factory.createTerm.bind(factory)));
     let res: Algebra.Operation;
 
     if (sparql.type === 'query') {
@@ -105,10 +105,10 @@ function translateQuery(sparql: SparqlQuery, quads?: boolean, blankToVariable?: 
         res = translateUpdate(sparql);
     }
     if (blankToVariable) {
-        res = translateBlankNodesToVariables(res, vars);
+        res = translateBlankNodesToVariables(res!, vars);
     }
 
-    return res;
+    return res!;
 }
 
 function isString(str: any): str is string
@@ -190,13 +190,13 @@ function translateGroupGraphPattern(thingy: Pattern) : Algebra.Operation
     // 18.2.2.6
     let result: Algebra.Operation;
     if (thingy.type === 'union')
-        result = nonfilters.map((p: any) =>
+        result = factory.createUnion(nonfilters.map((p: any) =>
         {
             // sparqljs doesn't always indicate the children are groups
             if (p.type !== 'group')
                 p = { type: 'group', patterns: [p] };
             return translateGroupGraphPattern(p);
-        }).reduce((acc: Algebra.Operation, item: Algebra.Operation) => factory.createUnion(acc, item));
+        }));
     else if (thingy.type === 'graph')
         // need to handle this separately since the filters need to be in the graph
         return translateGraph(thingy);
@@ -228,7 +228,7 @@ function translateExpression(exp: Expression | RDF.Term | Wildcard) : Algebra.Ex
     if (Util.isWildcard(exp))
         return factory.createWildcardExpression();
     if ('aggregation' in exp)
-        return factory.createAggregateExpression(exp.aggregation, translateExpression(exp.expression), exp.distinct, exp.separator);
+        return factory.createAggregateExpression(exp.aggregation, translateExpression(exp.expression), Boolean(exp.distinct), exp.separator);
     if ('function' in exp)
         // Outdated typings
         return factory.createNamedExpression(<RDF.NamedNode><unknown> exp.function, exp.args.map(translateExpression));
@@ -273,7 +273,7 @@ function translateBgp(thingy: BgpPattern) : Algebra.Operation
         joins.push(factory.createBgp(patterns));
     if (joins.length === 1)
         return joins[0];
-    return joins.reduce((acc, item) => factory.createJoin(acc, item));
+    return factory.createJoin(joins);
 }
 
 function translatePath(triple: Triple & { predicate: PropertyPath }) : Algebra.Operation[]
@@ -327,13 +327,13 @@ function translatePathPredicate(predicate: IriTerm | PropertyPath) : Algebra.Ope
             return normalElement;
         if (normals.length === 0)
             return invertedElement;
-        return factory.createAlt(normalElement, invertedElement);
+        return factory.createAlt([ normalElement, invertedElement, ]);
     }
 
     if (predicate.pathType === '/')
-        return predicate.items.map(translatePathPredicate).reduce((acc: Algebra.Operation, p: Algebra.Operation) => factory.createSeq(acc, p));
+        return factory.createSeq(predicate.items.map(translatePathPredicate));
     if (predicate.pathType === '|')
-        return predicate.items.map(translatePathPredicate).reduce((acc: Algebra.Operation, p: Algebra.Operation) => factory.createAlt(acc, p));
+        return factory.createAlt(predicate.items.map(translatePathPredicate));
     if (predicate.pathType === '*')
         return factory.createZeroOrMorePath(translatePathPredicate(predicate.items[0]));
     if (predicate.pathType === '+')
@@ -354,10 +354,16 @@ function simplifyPath(subject: RDF.Quad_Subject, predicate: Algebra.Operation, o
 
     if (predicate.type === types.SEQ)
     {
-        let v = generateFreshVar();
-        let left = simplifyPath(subject, (<Algebra.Seq>predicate).left, v);
-        let right = simplifyPath(v, (<Algebra.Seq>predicate).right, object);
-        return left.concat(right);
+        let joiner: RDF.Quad_Subject | RDF.Variable = subject;
+        const seq: Algebra.Seq = <Algebra.Seq> predicate;
+        return Util.flatten(seq.input.map((subOp, i) => {
+            const nextJoiner = i === seq.input.length - 1 ? object : generateFreshVar();
+            const simplifiedPath = simplifyPath(joiner, subOp, nextJoiner);
+            if (nextJoiner.termType === 'Variable') {
+                joiner = nextJoiner;
+            }
+            return simplifiedPath;
+        }));
     }
 
     return [ factory.createPath(subject, predicate, object) ];
@@ -511,7 +517,7 @@ function simplifiedJoin(G: Algebra.Operation, A: Algebra.Operation): Algebra.Ope
     else if (A.type === types.BGP && (<Algebra.Bgp>A).patterns.length === 0)
     {} // do nothing
     else
-        G = factory.createJoin(G, A);
+        G = factory.createJoin([ G, A ]);
     return G;
 }
 
@@ -547,7 +553,7 @@ function translateAggregates(query: Query, res: Algebra.Operation, variables: Se
     // if there are any aggregates or if we have a groupBy (both result in a GROUP)
     if (select.group || Object.keys(A).length > 0)
     {
-        const aggregates = Object.keys(A).map(v => translateBoundAggregate(A[v], <RDF.Variable>factory.createTerm(v)));
+        const aggregates = Object.keys(A).map(v => translateBoundAggregate(<AggregateExpression> A[v], <RDF.Variable>factory.createTerm(v)));
         const vars: RDF.Variable[] = [];
         if (select.group)
         {
@@ -574,7 +580,7 @@ function translateAggregates(query: Query, res: Algebra.Operation, variables: Se
 
     // 18.2.4.3
     if (query.values)
-        res = factory.createJoin(res, translateInlineData(query));
+        res = factory.createJoin([ res, translateInlineData(query) ]);
 
     // 18.2.4.4
     let PV = new Set<RDF.Term | Wildcard>();
@@ -640,7 +646,7 @@ function translateAggregates(query: Query, res: Algebra.Operation, variables: Se
     // Slicing needs to happen after construct/describe
     // 18.2.5.5
     if (select.offset || select.limit)
-        res = factory.createSlice(res, select.offset, select.limit);
+        res = factory.createSlice(res, select.offset || 0, select.limit);
 
     if (select.from)
         res = factory.createFrom(res, select.from.default, select.from.named);
@@ -744,7 +750,7 @@ function translateInsertDelete (thingy: InsertDeleteOperation): Algebra.Update
     return factory.createDeleteInsert(
         deleteTriples.length > 0 ? deleteTriples : undefined,
         insertTriples.length > 0 ? insertTriples : undefined,
-        where,
+        where!,
     );
 }
 
@@ -771,7 +777,7 @@ function translateUpdateGraph (thingy: CreateOperation | ClearDropOperation): Al
     else if (thingy.graph.named)
         source = 'NAMED';
     else
-        source = thingy.graph.name;
+        source = thingy.graph.name!;
 
     switch (thingy.type)
     {
@@ -788,8 +794,8 @@ function translateUpdateGraphLoad (thingy: LoadOperation): Algebra.Load
 
 function translateUpdateGraphShortcut (thingy: CopyMoveAddOperation): Algebra.UpdateGraphShortcut
 {
-    const source = thingy.source.default ? 'DEFAULT' : thingy.source.name;
-    const destination = thingy.destination.default ? 'DEFAULT' : thingy.destination.name;
+    const source: 'DEFAULT' | RDF.NamedNode = thingy.source.default ? 'DEFAULT' : <RDF.NamedNode> thingy.source.name;
+    const destination: 'DEFAULT' | RDF.NamedNode = thingy.destination.default ? 'DEFAULT' : <RDF.NamedNode> thingy.destination.name;
     switch (thingy.type)
     {
         case 'copy': return factory.createCopy(source, destination, thingy.silent);

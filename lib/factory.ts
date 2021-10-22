@@ -15,7 +15,7 @@ export default class Factory
         this.stringType = <RDF.NamedNode>this.createTerm('http://www.w3.org/2001/XMLSchema#string');
     }
 
-    createAlt (left: A.PropertyPathSymbol, right: A.PropertyPathSymbol): A.Alt { return { type: A.types.ALT, left, right }; }
+    createAlt (input: A.PropertyPathSymbol[], flatten = true): A.Alt { return this.flattenMulti({ type: A.types.ALT, input }, flatten); }
     createAsk (input: A.Operation): A.Ask { return { type: A.types.ASK, input }; }
     createBoundAggregate (variable: RDF.Variable, aggregate: string, expression: A.Expression, distinct: boolean, separator?: string): A.BoundAggregate
     {
@@ -33,15 +33,15 @@ export default class Factory
     createGraph (input: A.Operation, name: RDF.Term) : A.Graph { return { type: A.types.GRAPH, input, name }; }
     createGroup (input: A.Operation, variables: RDF.Variable[], aggregates: A.BoundAggregate[]) : A.Group { return { type: A.types.GROUP, input, variables, aggregates }; }
     createInv (path: A.PropertyPathSymbol): A.Inv { return { type: A.types.INV, path }; }
-    createJoin (left: A.Operation, right: A.Operation): A.Join { return { type: A.types.JOIN, left, right }; }
+    createJoin (input: A.Operation[], flatten = true): A.Join { return this.flattenMulti({ type: A.types.JOIN, input }, flatten); }
     createLeftJoin (left: A.Operation, right: A.Operation, expression?: A.Expression): A.LeftJoin
     {
         if (expression)
-            return { type: A.types.LEFT_JOIN, left, right, expression };
-        return { type: A.types.LEFT_JOIN, left, right };
+            return { type: A.types.LEFT_JOIN, input: [ left, right ], expression };
+        return { type: A.types.LEFT_JOIN, input: [ left, right ] };
     }
     createLink (iri: RDF.NamedNode): A.Link { return { type: A.types.LINK, iri }; }
-    createMinus (left: A.Operation, right: A.Operation): A.Minus { return { type: A.types.MINUS, left, right }; }
+    createMinus (left: A.Operation, right: A.Operation): A.Minus { return { type: A.types.MINUS, input: [ left, right ] }; }
     createNop (): A.Nop { return { type: A.types.NOP }; }
     createNps (iris: RDF.NamedNode[]): A.Nps { return { type: A.types.NPS, iris }; }
     createOneOrMorePath (path: A.PropertyPathSymbol): A.OneOrMorePath { return { type: A.types.ONE_OR_MORE_PATH, path }; }
@@ -60,8 +60,8 @@ export default class Factory
     }
     createProject (input: A.Operation, variables: (RDF.Variable | Wildcard)[]) : A.Project { return { type: A.types.PROJECT, input, variables }; }
     createReduced (input: A.Operation) : A.Reduced { return { type: A.types.REDUCED, input }; }
-    createSeq (left: A.PropertyPathSymbol, right: A.PropertyPathSymbol): A.Seq { return { type: A.types.SEQ, left, right }; }
-    createService (input: A.Operation, name: RDF.Term, silent?: boolean): A.Service { return { type: A.types.SERVICE, input, name, silent }; }
+    createSeq (input: A.PropertyPathSymbol[], flatten = true): A.Seq { return this.flattenMulti({ type: A.types.SEQ, input }, flatten); }
+    createService (input: A.Operation, name: RDF.Term, silent?: boolean): A.Service { return { type: A.types.SERVICE, input, name, silent: Boolean(silent) }; }
     createSlice (input: A.Operation, start: number, length?: number) : A.Slice
     {
         start = start || 0;
@@ -69,7 +69,7 @@ export default class Factory
             return { type: A.types.SLICE, input, start, length };
         return { type: A.types.SLICE, input, start };
     }
-    createUnion (left: A.Operation, right: A.Operation): A.Union { return { type: A.types.UNION, left, right }; }
+    createUnion (input: A.Operation[], flatten = true): A.Union { return this.flattenMulti({ type: A.types.UNION, input }, flatten); }
     createValues (variables: RDF.Variable[], bindings: {[key: string]: RDF.Term}[]): A.Values { return { type: A.types.VALUES, variables, bindings }; }
     createZeroOrMorePath (path: A.PropertyPathSymbol): A.ZeroOrMorePath { return { type: A.types.ZERO_OR_MORE_PATH, path }; }
     createZeroOrOnePath (path: A.PropertyPathSymbol): A.ZeroOrOnePath { return { type: A.types.ZERO_OR_ONE_PATH, path }; }
@@ -106,29 +106,46 @@ export default class Factory
         const result: A.Load = { type: A.types.LOAD, source };
         if (destination)
             result.destination = destination;
-        return this.addSilent(result, silent);
+        return this.addSilent(result, Boolean(silent));
     }
     createClear (source: 'DEFAULT' | 'NAMED' | 'ALL' | RDF.NamedNode, silent?: boolean): A.Clear {
-        return this.addSilent({ type: A.types.CLEAR, source }, silent);
+        return this.addSilent({ type: A.types.CLEAR, source }, Boolean(silent));
     }
     createCreate (source: RDF.NamedNode, silent?: boolean): A.Create {
-        return this.addSilent({ type: A.types.CREATE, source }, silent);
+        return this.addSilent({ type: A.types.CREATE, source }, Boolean(silent));
     }
     createDrop (source: 'DEFAULT' | 'NAMED' | 'ALL' | RDF.NamedNode, silent?: boolean): A.Drop {
-        return this.addSilent({ type: A.types.DROP, source }, silent);
+        return this.addSilent({ type: A.types.DROP, source }, Boolean(silent));
     }
     createAdd (source: 'DEFAULT' | RDF.NamedNode, destination: 'DEFAULT' | RDF.NamedNode, silent?: boolean): A.Add {
-        return this.addSilent({ type: A.types.ADD, source, destination }, silent);
+        return this.addSilent({ type: A.types.ADD, source, destination }, Boolean(silent));
     }
     createMove (source: 'DEFAULT' | RDF.NamedNode, destination: 'DEFAULT' | RDF.NamedNode, silent?: boolean): A.Move {
-        return this.addSilent({ type: A.types.MOVE, source, destination }, silent);
+        return this.addSilent({ type: A.types.MOVE, source, destination }, Boolean(silent));
     }
     createCopy (source: 'DEFAULT' | RDF.NamedNode, destination: 'DEFAULT' | RDF.NamedNode, silent?: boolean): A.Copy {
-        return this.addSilent({ type: A.types.COPY, source, destination }, silent);
+        return this.addSilent({ type: A.types.COPY, source, destination }, Boolean(silent));
     }
     private addSilent<T extends A.UpdateGraph>(input: T, silent: boolean): T {
         if (silent)
             input.silent = silent;
+        return input;
+    }
+    private flattenMulti<T extends A.Multi>(input: T, flatten: boolean): T {
+        if (!flatten) {
+            return input;
+        }
+        const type = input.type;
+        const children = input.input;
+        let newChildren: A.Operation[] = [];
+        for (const child of children) {
+            if (child.type === type) {
+                newChildren.push(...(<A.Multi> child).input);
+            } else {
+                newChildren.push(child);
+            }
+        }
+        input.input = newChildren;
         return input;
     }
 }

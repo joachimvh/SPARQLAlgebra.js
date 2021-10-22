@@ -322,10 +322,7 @@ function translateGroup(op: Algebra.Group): any
 
 function translateJoin(op: Algebra.Join): Pattern[]
 {
-    const arr: any[] = Util.flatten([
-        translateOperation(op.left),
-        translateOperation(op.right)
-    ]);
+    const arr: any[] = Util.flatten(op.input.map(translateOperation));
 
     // Merge bgps
     // This is possible if one side was a path and the other a bgp for example
@@ -344,7 +341,7 @@ function translateLeftJoin(op: Algebra.LeftJoin): Pattern[]
     const leftjoin = {
         type: 'optional',
         patterns: [
-            translateOperation(op.right)
+            translateOperation(op.input[1])
         ]
     };
 
@@ -360,20 +357,20 @@ function translateLeftJoin(op: Algebra.LeftJoin): Pattern[]
     leftjoin.patterns = Util.flatten(leftjoin.patterns);
 
     return Util.flatten([
-        translateOperation(op.left),
+        translateOperation(op.input[0]),
         leftjoin
     ])
 }
 
 function translateMinus(op: Algebra.Minus): Pattern[]
 {
-    let patterns = translateOperation(op.right);
+    let patterns = translateOperation(op.input[1]);
     if (patterns.type === 'group')
         patterns = patterns.patterns;
     if (!Array.isArray(patterns))
         patterns = [ patterns ];
     return Util.flatten([
-        translateOperation(op.left),
+        translateOperation(op.input[0]),
         {
             type: 'minus',
             patterns: patterns
@@ -588,10 +585,7 @@ function translateUnion(op: Algebra.Union): UnionPattern
 {
     return {
         type: 'union',
-        patterns: Util.flatten([
-            translateOperation(op.left),
-            translateOperation(op.right)
-        ])
+        patterns: Util.flatten(op.input.map(translateOperation))
     }
 }
 
@@ -620,9 +614,8 @@ function translateValues(op: Algebra.Values): ValuesPattern
 
 function translateAlt(path: Algebra.Alt): any
 {
-    const left = translatePathComponent(path.left);
-    const right = translatePathComponent(path.right);
-    if ('pathType' in left && left.pathType === '!' && 'pathType' in right && right.pathType === '!')
+    const mapped = path.input.map(translatePathComponent);
+    if (mapped.every(entry => 'pathType' in entry && entry.pathType === '!'))
     {
         return {
             type: 'path',
@@ -630,7 +623,7 @@ function translateAlt(path: Algebra.Alt): any
             items: [ {
                 type: 'path',
                 pathType: '|',
-                items: [].concat(left.items, right.items)
+                items: Util.flatten(mapped.map(entry => (<PropertyPath> entry).items))
             } ]
         }
     }
@@ -638,7 +631,7 @@ function translateAlt(path: Algebra.Alt): any
     return {
         type: 'path',
         pathType: '|',
-        items: [ left, right ]
+        items: mapped
     }
 }
 
@@ -721,7 +714,7 @@ function translateSeq(path: Algebra.Seq): PropertyPath
     return {
         type: 'path',
         pathType: '/',
-        items: [ translatePathComponent(path.left), translatePathComponent(path.right) ]
+        items: path.input.map(translatePathComponent)
     }
 }
 
@@ -767,8 +760,8 @@ function translateDeleteInsert(op: Algebra.DeleteInsert): Update
 
     const updates: [InsertDeleteOperation] = [{
         updateType: 'insertdelete',
-        delete: convertUpdatePatterns(op.delete),
-        insert: convertUpdatePatterns(op.insert),
+        delete: convertUpdatePatterns(op.delete || []),
+        insert: convertUpdatePatterns(op.insert || []),
     }];
     // Typings don't support 'using' yet
     if (using)
@@ -792,8 +785,8 @@ function translateDeleteInsert(op: Algebra.DeleteInsert): Update
             if (graphNames.length !== 1)
                 throw new Error('This is unexpected and might indicate an error in graph handling for updates.');
             // ignore if default graph
-            if (graphs[graphNames[0]].graph.value !== '')
-                updates[0].where = [{ type: 'graph', patterns: updates[0].where, name: graphs[graphNames[0]].graph as any }]
+            if (graphs[graphNames[0]]!.graph.value !== '')
+                updates[0].where = [{ type: 'graph', patterns: updates[0].where!, name: graphs[graphNames[0]]!.graph as any }]
         }
     }
 
@@ -805,7 +798,7 @@ function translateDeleteInsert(op: Algebra.DeleteInsert): Update
     } else if (!op.insert && !op.where) {
         delete updates[0].insert;
         delete updates[0].where;
-        if (op.delete.some(pattern =>
+        if (op.delete!.some(pattern =>
           pattern.subject.termType === 'Variable' ||
           pattern.predicate.termType === 'Variable' ||
           pattern.object.termType === 'Variable'))
@@ -813,7 +806,7 @@ function translateDeleteInsert(op: Algebra.DeleteInsert): Update
         else
             updates[0].updateType = 'delete';
     } else if (!op.insert && op.where && op.where.type === 'bgp') {
-        if (isomorphic(op.delete, (op.where as Algebra.Bgp).patterns)) {
+        if (isomorphic(op.delete!, (op.where as Algebra.Bgp).patterns)) {
             delete updates[0].where;
             updates[0].updateType = 'deletewhere';
         }
@@ -929,7 +922,7 @@ function removeQuadsRecursive(op: any, graphs: NodeJS.Dict<{ graph: RDF.Term, va
     {
         if (!graphs[op.graph.value])
             graphs[op.graph.value] = { graph: op.graph, values: []};
-        graphs[op.graph.value].values.push(op);
+        graphs[op.graph.value]!.values.push(op);
         return op;
     }
 
@@ -951,7 +944,7 @@ function removeQuadsRecursive(op: any, graphs: NodeJS.Dict<{ graph: RDF.Term, va
             for (let i = 1; i < graphNames.length; ++i)
             {
                 const right = potentialGraphFromPatterns(<Algebra.Pattern[]>newGraphs[graphNames[i]].values);
-                left = factory.createJoin(left, right);
+                left = factory.createJoin([ left, right ]);
             }
             graphNames.map(name => delete newGraphs[name]);
             // this ignores the result object that is being generated, but should not be a problem

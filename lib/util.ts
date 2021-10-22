@@ -5,6 +5,7 @@ import {Expression, Operation, expressionTypes, types} from "./algebra";
 import Factory from "./factory";
 import { BaseQuad, Variable } from "@rdfjs/types";
 import * as RDF from '@rdfjs/types'
+import * as rdfjs from '@rdfjs/types';
 
 
 export default class Util
@@ -193,8 +194,7 @@ export default class Util
         {
             case types.ALT:
                 const alt: A.Alt = <A.Alt> result;
-                recurseOp(alt.left);
-                recurseOp(alt.right);
+                alt.input.map(recurseOp);
                 break;
             case types.ASK:
                 const ask: A.Ask = <A.Ask> result;
@@ -254,21 +254,18 @@ export default class Util
                 break;
             case types.JOIN:
                 const join: A.Join = <A.Join> result;
-                recurseOp(join.left);
-                recurseOp(join.right);
+                join.input.map(recurseOp);
                 break;
             case types.LEFT_JOIN:
                 const leftJoin: A.LeftJoin = <A.LeftJoin> result;
-                recurseOp(leftJoin.left);
-                recurseOp(leftJoin.right);
+                leftJoin.input.map(recurseOp);
                 if (leftJoin.expression) recurseOp(leftJoin.expression);
                 break;
             case types.LINK:
                 break;
             case types.MINUS:
                 const minus: A.Minus = <A.Minus> result;
-                recurseOp(minus.left);
-                recurseOp(minus.right);
+                minus.input.map(recurseOp);
                 break;
             case types.NOP:
                 break;
@@ -299,8 +296,7 @@ export default class Util
                 break;
             case types.SEQ:
                 const seq: A.Seq = <A.Seq> result;
-                recurseOp(seq.left);
-                recurseOp(seq.right);
+                seq.input.map(recurseOp);
                 break;
             case types.SERVICE:
                 const service: A.Service = <A.Service> result;
@@ -312,8 +308,7 @@ export default class Util
                 break;
             case types.UNION:
                 const union: A.Union = <A.Union> result;
-                recurseOp(union.left);
-                recurseOp(union.right);
+                union.input.map(recurseOp);
                 break;
             case types.VALUES:
                 break;
@@ -381,7 +376,7 @@ export default class Util
         {
             case types.ALT:
                 const alt: A.Alt = <A.Alt> result;
-                return factory.createAlt(mapOp(alt.left), mapOp(alt.right));
+                return factory.createAlt(alt.input.map(mapOp));
             case types.ASK:
                 const ask: A.Ask = <A.Ask> result;
                 return factory.createAsk(mapOp(ask.input));
@@ -408,7 +403,7 @@ export default class Util
                 return factory.createFilter(mapOp(filter.input), <A.Expression> mapOp(filter.expression));
             case types.FROM:
                 const from: A.From = <A.From> result;
-                return factory.createFrom(mapOp(from.input), [].concat(from.default), [].concat(from.named));
+                return factory.createFrom(mapOp(from.input), (<RDF.Term[]>[]).concat(from.default), (<RDF.Term[]>[]).concat(from.named));
             case types.GRAPH:
                 const graph: A.Graph = <A.Graph> result;
                 return factory.createGraph(mapOp(graph.input), graph.name);
@@ -416,31 +411,31 @@ export default class Util
                 const group: A.Group = <A.Group> result;
                 return factory.createGroup(
                     mapOp(group.input),
-                    [].concat(group.variables),
+                    (<RDF.Variable[]>[]).concat(group.variables),
                     <A.BoundAggregate[]> group.aggregates.map(mapOp));
             case types.INV:
                 const inv: A.Inv = <A.Inv> result;
                 return factory.createInv(mapOp(inv.path));
             case types.JOIN:
                 const join: A.Join = <A.Join> result;
-                return factory.createJoin(mapOp(join.left), mapOp(join.right));
+                return factory.createJoin(join.input.map(mapOp));
             case types.LEFT_JOIN:
                 const leftJoin: A.LeftJoin = <A.LeftJoin> result;
                 return factory.createLeftJoin(
-                    mapOp(leftJoin.left),
-                    mapOp(leftJoin.right),
+                    mapOp(leftJoin.input[0]),
+                    mapOp(leftJoin.input[1]),
                     leftJoin.expression ? <A.Expression> mapOp(leftJoin.expression) : undefined);
             case types.LINK:
                 const link: A.Link = <A.Link> result;
                 return factory.createLink(link.iri);
             case types.MINUS:
                 const minus: A.Minus = <A.Minus> result;
-                return factory.createMinus(mapOp(minus.left), mapOp(minus.right));
+                return factory.createMinus(mapOp(minus.input[0]), mapOp(minus.input[1]));
             case types.NOP:
                 return factory.createNop();
             case types.NPS:
                 const nps: A.Nps = <A.Nps> result;
-                return factory.createNps([].concat(nps.iris));
+                return factory.createNps((<RDF.NamedNode[]>[]).concat(nps.iris));
             case types.ONE_OR_MORE_PATH:
                 const oom: A.OneOrMorePath = <A.OneOrMorePath> result;
                 return factory.createOneOrMorePath(mapOp(oom.path));
@@ -455,13 +450,13 @@ export default class Util
                 return factory.createPattern(pattern.subject, pattern.predicate, pattern.object, pattern.graph);
             case types.PROJECT:
                 const project: A.Project = <A.Project> result;
-                return factory.createProject(mapOp(project.input), [].concat(project.variables));
+                return factory.createProject(mapOp(project.input), (<((RDF.Variable | Wildcard)[])>[]).concat(project.variables));
             case types.REDUCED:
                 const reduced: A.Reduced = <A.Reduced> result;
                 return factory.createReduced(mapOp(reduced.input));
             case types.SEQ:
                 const seq: A.Seq = <A.Seq> result;
-                return factory.createSeq(mapOp(seq.left), mapOp(seq.right));
+                return factory.createSeq(seq.input.map(mapOp));
             case types.SERVICE:
                 const service: A.Service = <A.Service> result;
                 return factory.createService(mapOp(service.input), service.name, service.silent);
@@ -470,10 +465,10 @@ export default class Util
                 return factory.createSlice(mapOp(slice.input), slice.start, slice.length);
             case types.UNION:
                 const union: A.Union = <A.Union> result;
-                return factory.createUnion(mapOp(union.left), mapOp(union.right));
+                return factory.createUnion(union.input.map(mapOp));
             case types.VALUES:
                 const values: A.Values = <A.Values> result;
-                return factory.createValues([].concat(values.variables), values.bindings.map(b => Object.assign({}, b)));
+                return factory.createValues((<RDF.Variable[]>[]).concat(values.variables), values.bindings.map(b => Object.assign({}, b)));
             case types.ZERO_OR_MORE_PATH:
                 const zom: A.ZeroOrMorePath = <A.ZeroOrMorePath> result;
                 return factory.createZeroOrMorePath(mapOp(zom.path));
@@ -563,7 +558,7 @@ export default class Util
         while (variables[labelLoop]) {
             labelLoop = `${label}${counter++}`;
         }
-        return dataFactory.variable(labelLoop);
+        return dataFactory.variable!(labelLoop);
     }
 
     // separate terms from wildcard since we handle them differently
