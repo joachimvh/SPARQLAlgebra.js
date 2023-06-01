@@ -445,7 +445,7 @@ export default class Util
      * @param {Factory} factory - Factory used to create new Operations. Will use default factory if none is provided.
      * @returns {Operation} - The copied result.
      */
-    private static mapExpression(expr: A.Expression,
+    public static mapExpression(expr: A.Expression,
       callbacks:{ [T in A.types]?: (op: TypedOperation<T>, factory: Factory) => RecurseResult },
       factory: Factory): A.Expression
     {
