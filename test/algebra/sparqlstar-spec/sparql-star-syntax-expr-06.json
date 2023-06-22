@@ -35,27 +35,34 @@
       },
       "expression": {
         "type": "expression",
-        "expressionType": "term",
-        "term": {
-          "type": "pattern",
-          "termType": "Quad",
-          "subject": {
-            "termType": "Variable",
-            "value": "s"
+        "expressionType": "operator",
+        "operator": "triple",
+        "args": [
+          {
+            "type": "expression",
+            "expressionType": "term",
+            "term": {
+              "termType": "Variable",
+              "value": "s"
+            }
           },
-          "predicate": {
-            "termType": "Variable",
-            "value": "p"
+          {
+            "type": "expression",
+            "expressionType": "term",
+            "term": {
+              "termType": "Variable",
+              "value": "p"
+            }
           },
-          "object": {
-            "termType": "Variable",
-            "value": "o"
-          },
-          "graph": {
-            "termType": "DefaultGraph",
-            "value": ""
+          {
+            "type": "expression",
+            "expressionType": "term",
+            "term": {
+              "termType": "Variable",
+              "value": "o"
+            }
           }
-        }
+        ]
       }
     },
     "name": {

@@ -33,43 +33,57 @@
     },
     "expression": {
       "type": "expression",
-      "expressionType": "term",
-      "term": {
-        "type": "pattern",
-        "termType": "Quad",
-        "subject": {
-          "type": "pattern",
-          "termType": "Quad",
-          "subject": {
-            "termType": "Variable",
-            "value": "s"
-          },
-          "predicate": {
-            "termType": "Variable",
-            "value": "p"
-          },
-          "object": {
-            "termType": "Variable",
-            "value": "o"
-          },
-          "graph": {
-            "termType": "DefaultGraph",
-            "value": ""
+      "expressionType": "operator",
+      "operator": "triple",
+      "args": [
+        {
+          "type": "expression",
+          "expressionType": "operator",
+          "operator": "triple",
+          "args": [
+            {
+              "type": "expression",
+              "expressionType": "term",
+              "term": {
+                "termType": "Variable",
+                "value": "s"
+              }
+            },
+            {
+              "type": "expression",
+              "expressionType": "term",
+              "term": {
+                "termType": "Variable",
+                "value": "p"
+              }
+            },
+            {
+              "type": "expression",
+              "expressionType": "term",
+              "term": {
+                "termType": "Variable",
+                "value": "o"
+              }
+            }
+          ]
+        },
+        {
+          "type": "expression",
+          "expressionType": "term",
+          "term": {
+            "termType": "NamedNode",
+            "value": "http://example.com/ns#q"
           }
         },
-        "predicate": {
-          "termType": "NamedNode",
-          "value": "http://example.com/ns#q"
-        },
-        "object": {
-          "termType": "NamedNode",
-          "value": "http://example.com/ns#z"
-        },
-        "graph": {
-          "termType": "DefaultGraph",
-          "value": ""
+        {
+          "type": "expression",
+          "expressionType": "term",
+          "term": {
+            "termType": "NamedNode",
+            "value": "http://example.com/ns#z"
+          }
         }
-      }
+      ]
     }
   },
   "variables": [
