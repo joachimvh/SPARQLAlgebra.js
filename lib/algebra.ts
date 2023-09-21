@@ -80,7 +80,7 @@ export type TypedExpression<T extends expressionTypes> = Extract<Expression, { e
 export interface BaseOperation
 {
     [key:string]: any;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     type: types;
 }
 
