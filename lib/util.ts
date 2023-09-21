@@ -335,15 +335,18 @@ export default class Util
             const recurseResult = callback(op as any, factory);
             result = recurseResult.result;
             doRecursion = recurseResult.recurse;
-            copyMetadata = !recurseResult.skipMetadataCopy;
+            copyMetadata = recurseResult.copyMetadata !== false;
         }
 
-        const originalMetadata = result.metadata || op.metadata;
+        let toCopyMetadata;
+        if (copyMetadata && (result.metadata || op.metadata)) {
+            toCopyMetadata = { ...result.metadata, ...op.metadata };
+        }
 
         if (!doRecursion) {
             // Inherit metadata
-            if (originalMetadata && copyMetadata) {
-                result.metadata = originalMetadata;
+            if (toCopyMetadata) {
+                result.metadata = toCopyMetadata;
             }
 
             return result;
@@ -492,8 +495,8 @@ export default class Util
         }
 
         // Inherit metadata
-        if (originalMetadata && copyMetadata) {
-            result.metadata = originalMetadata;
+        if (toCopyMetadata) {
+            result.metadata = toCopyMetadata;
         }
 
         return result;
@@ -600,24 +603,24 @@ export default class Util
  * @interface RecurseResult
  * @property {Operation} result - The resulting A.Operation.
  * @property {boolean} recurse - Whether to continue with recursion.
- * @property {boolean} skipMetadataCopy - If the metadata object should not be copied.
+ * @property {boolean} copyMetadata - If the metadata object should be copied. Defaults to true.
  */
 export interface RecurseResult
 {
     result: A.Operation;
     recurse: boolean;
-    skipMetadataCopy?: boolean;
+    copyMetadata?: boolean;
 }
 
 /**
  * @interface ExpressionRecurseResult
  * @property {Expression} result - The resulting A.Expression.
  * @property {boolean} recurse - Whether to continue with recursion.
- * @property {boolean} skipMetadataCopy - If the metadata object should not be copied.
+ * @property {boolean} copyMetadata - If the metadata object should be copied. Defaults to true.
  */
 export interface ExpressionRecurseResult
 {
     result: A.Expression;
     recurse: boolean;
-    skipMetadataCopy?: boolean;
+    copyMetadata?: boolean;
 }
