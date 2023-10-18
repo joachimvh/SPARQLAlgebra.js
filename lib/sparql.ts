@@ -279,12 +279,14 @@ function translateExtend(op: Algebra.Extend): any
 function translateFrom(op: Algebra.From): GroupPattern
 {
     const result = translateOperation(op.input);
-    // project is nested in group object
-    const obj: SelectQuery = result.patterns[0];
-    obj.from = {
-        default: op.default,
-        named: op.named
-    };
+    if (result.patterns[0] !== undefined) {
+        // project is nested in group object
+        const obj: SelectQuery = result.patterns[0];
+        obj.from = {
+            default: op.default,
+            named: op.named
+        };
+    }
     return result;
 }
 
