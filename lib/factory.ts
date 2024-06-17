@@ -86,6 +86,10 @@ export default class Factory
 
     createTerm (str: string): RDF.Term
     {
+        console.log("creatingTerm");
+        if (str[0] === '$') {
+            str = str.replace('$', '?');
+        }
         return stringToTerm(str, this.dataFactory);
     }
 
