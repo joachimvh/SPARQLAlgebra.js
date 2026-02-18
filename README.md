@@ -5,7 +5,7 @@
 
 > [!warning]
 > Both SPARQLAlgebra.js, and the [parser on which it builds](https://github.com/RubenVerborgh/SPARQL.js), have been deprecated in favour of the [Traqula](https://github.com/comunica/traqula) modular parser, generator and transformer framework.
-> Traqula supports parsing, generating, and algebra transforming for SPARQL 1.1 and 1.2.
+> Traqula supports parsing, generating, and transforming algebra for SPARQL 1.1 and 1.2.
 > To migrate, follow the [short migration guide on Traqula's repository](https://github.com/comunica/traqula/blob/main/docs/sparqlAlgebraMigration.md).
 
 2 components get exposed: the **translate** function and the **Algebra** object,
